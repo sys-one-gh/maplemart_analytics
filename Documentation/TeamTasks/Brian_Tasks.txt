@@ -1,0 +1,125 @@
+==================================================================
+TASK FILE: BRIAN  (P7 - STORED PROCEDURE & FUNCTION DEVELOPER)
+Intelligent Customer Campaign Prediction Platform
+Deadline: Wednesday, August 12, 2026
+Estimated time: 8-10 hours
+==================================================================
+
+YOUR ROLE
+You build reusable SQL Server functions (used by Lien's views) and
+stored procedures (used by Sahil's Python and Parth's AI reports).
+Your functions must be done BEFORE Lien's views, so build those
+first.
+
+YOU ARE BLOCKED UNTIL:
+- Sahasri's data import is complete (Day 2-3), so you have real
+  data to test against
+
+------------------------------------------------------------------
+PRIMARY TASK F, PART 1 - 5 FUNCTIONS (Day 3 - DO THIS FIRST)
+------------------------------------------------------------------
+Create Database/Functions/08_CreateFunctions.sql:
+
+1. ufnCustomerAge(@CustomerID INT) RETURNS INT
+   Calculate age from Customer.DateOfBirth (or just return the
+   stored Age column if your team decided to trust it - document
+   which approach you used).
+
+2. ufnCustomerLifetimeValue(@CustomerID INT) RETURNS DECIMAL(12,2)
+   SUM of TransactionTotal from SalesTransaction for that customer.
+
+3. ufnAveragePurchase(@CustomerID INT) RETURNS DECIMAL(10,2)
+   AVG of TransactionTotal from SalesTransaction for that customer.
+
+4. ufnCampaignResponseRate(@CustomerID INT) RETURNS DECIMAL(5,2)
+   Percentage: (COUNT of CampaignResponse where
+   PurchaseCompleted = 1) / (COUNT of all CampaignResponse) * 100
+   for that customer. Return 0 (not NULL, not error) if the
+   customer has zero campaign responses.
+
+5. ufnDaysSinceLastPurchase(@CustomerID INT) RETURNS INT
+   DATEDIFF(DAY, MAX(TransactionDate), GETDATE()) from
+   SalesTransaction for that customer. Return NULL or a large
+   sentinel value if the customer has zero transactions - document
+   your choice.
+
+Test each function individually:
+  SELECT dbo.ufnCustomerAge(1), dbo.ufnCustomerLifetimeValue(1), etc.
+against a few real CustomerIDs to confirm sane output before
+telling Lien they're ready.
+
+------------------------------------------------------------------
+PRIMARY TASK F, PART 2 - 7 STORED PROCEDURES (Day 3)
+------------------------------------------------------------------
+Create Database/StoredProcedures/09_CreateStoredProcedures.sql:
+
+1. uspLoadDataset
+   (Coordinate with Sahasri - she may write the actual load logic;
+   you may just need to wrap it as a callable procedure, or build
+   it together.)
+
+2. uspGenerateCustomerMetrics
+   Recalculates/refreshes any stored customer-level metrics if your
+   design caches them (otherwise this can call the 4 functions
+   above per customer and return a result set).
+
+3. uspRefreshAnalytics
+   A simple procedure that re-runs whatever needs refreshing after
+   new data loads (can be minimal - e.g. rebuild indexes or just
+   document that the views are always live/no caching needed).
+
+4. uspGeneratePredictionDataset
+   SELECT * FROM vwCustomerAnalytics (Lien's view) - packaged as a
+   procedure so Sahil's Python can call one procedure name instead
+   of hardcoding a SELECT statement. Accept no parameters, return
+   the full customer analytical dataset.
+
+5. uspStorePredictionResults
+   Parameters: @CustomerID, @PredictionDate, @PredictionProbability,
+   @PredictionResult, @MLModel, @ModelVersion
+   INSERT one row into CustomerPrediction. Sahil's Python will call
+   this once per customer (or you can design a table-valued
+   parameter version for bulk insert - simpler version is fine).
+
+6. uspStoreAIReport
+   Parameters: @ReportType, @CampaignID (nullable),
+   @ModelName, @PromptVersion, @ReportText
+   INSERT one row into AIReport with GeneratedDate = GETDATE() and
+   Approved = 0 by default. Parth's Python will call this.
+
+7. uspCampaignSummary
+   Parameters: @CampaignID (or none, for all campaigns)
+   Returns a result set summarizing that campaign: customers
+   contacted, response rate, purchase completion rate, revenue
+   generated - this is what Parth's AI will summarize into
+   plain-language text.
+
+Test every procedure with EXEC before marking done.
+
+------------------------------------------------------------------
+SECONDARY TASK - MODELEXECUTION LOGGING (Day 4)
+------------------------------------------------------------------
+1. Confirm the ModelExecution table exists (Hassana builds the
+   table structure in 04_CreateAnalyticalTables.sql - coordinate
+   with her on exact columns: ExecutionID, ExecutionDate, Algorithm,
+   Accuracy, Precision, Recall, F1Score, ExecutionDurationSeconds)
+2. Write a small stored procedure uspLogModelExecution(@Algorithm,
+   @Accuracy, @Precision, @Recall, @F1Score, @DurationSeconds) that
+   Sahil's Python calls once after every training run, so there's a
+   history of every model attempt (not just the final one).
+
+DELIVERABLES: uspLogModelExecution added to
+09_CreateStoredProcedures.sql
+
+------------------------------------------------------------------
+YOUR DELIVERABLES CHECKLIST
+------------------------------------------------------------------
+[ ] Database/Functions/08_CreateFunctions.sql (5 functions, tested)
+[ ] Database/StoredProcedures/09_CreateStoredProcedures.sql
+    (7 procedures + uspLogModelExecution, tested)
+[ ] Notify Lien functions are ready (she needs them for views)
+[ ] Notify Sahil uspGeneratePredictionDataset,
+    uspStorePredictionResults, and uspLogModelExecution are ready
+[ ] Notify Parth uspStoreAIReport and uspCampaignSummary are ready
+[ ] Push to feature/database, notify Dhruv for merge
+==================================================================

@@ -1,0 +1,107 @@
+==================================================================
+TASK FILE: SAHASRI  (P5 - DATA IMPORT & QUALITY DEVELOPER)
+Intelligent Customer Campaign Prediction Platform
+Deadline: Wednesday, August 12, 2026
+Estimated time: 6-8 hours
+==================================================================
+
+YOUR ROLE
+You load the 10 provided CSVs into the SQL Server tables Hassana
+built, in the correct order, and confirm the data is clean.
+
+YOU ARE BLOCKED UNTIL:
+- Hassana's tables/constraints exist (Database scripts 01-06 done)
+- The 10 CSVs are in the repo's Dataset/ folder (Dhruv puts them
+  there Day 1)
+
+------------------------------------------------------------------
+PRIMARY TASK D - DATASET IMPORT (Day 2)
+------------------------------------------------------------------
+The 10 CSVs and their approximate row counts:
+  Stores.csv                25 rows
+  ProductCategories.csv     18 rows
+  Products.csv              500 rows
+  Customers.csv              5,000 rows
+  LoyaltyMemberships.csv    5,000 rows
+  Employees.csv              250 rows
+  MarketingCampaigns.csv     40 rows
+  SalesTransactions.csv     75,000 rows
+  SalesTransactionItems.csv 250,000 rows
+  CampaignResponses.csv     18,000 rows
+
+1. MANDATORY IMPORT ORDER (respects foreign key dependencies):
+   1. Stores.csv          -> Store
+   2. ProductCategories.csv -> ProductCategory
+   3. Products.csv         -> Product
+   4. Customers.csv        -> Customer
+   5. LoyaltyMemberships.csv -> LoyaltyMembership
+   6. Employees.csv        -> Employee
+   7. MarketingCampaigns.csv -> MarketingCampaign
+   8. SalesTransactions.csv -> SalesTransaction
+   9. SalesTransactionItems.csv -> SalesTransactionItem
+   10. CampaignResponses.csv -> CampaignResponse
+
+   Note: Before step 4/5, seed the LoyaltyLevel reference table
+   from the distinct MembershipLevel values found in
+   LoyaltyMemberships.csv. Before step 8, seed the PaymentMethod
+   reference table from the distinct PaymentMethod values in
+   SalesTransactions.csv.
+
+2. Write Database/DatabaseCreation/10_LoadDataset.sql and/or a
+   stored procedure uspLoadDataset that uses BULK INSERT (or
+   OPENROWSET/BCP if BULK INSERT path issues come up in Docker) to
+   load each CSV into its matching table, following the order
+   above.
+   - If using BULK INSERT, make sure the CSV path is accessible
+     from inside/mounted to the SQL Server container.
+   - Handle the header row (FIRSTROW = 2).
+   - Match delimiters and date formats to the actual CSV format
+     (dates look like 2025-05-25, i.e. ISO/YYYY-MM-DD).
+
+3. After each table loads, verify row count with a quick
+   SELECT COUNT(*) and compare to the expected counts above.
+
+4. Coordinate with Kelvin - once you're done, tell her to run
+   12_Validation.sql against the loaded data.
+
+DELIVERABLES: Database/DatabaseCreation/10_LoadDataset.sql (or
+uspLoadDataset), all 10 tables populated with matching row counts
+
+------------------------------------------------------------------
+SECONDARY TASK - DATA QUALITY REPORT (Day 2-3)
+------------------------------------------------------------------
+Write Documentation/DataQualityReport.md covering, for the dataset
+as a whole:
+1. Missing values - run SELECT COUNT(*) WHERE column IS NULL for
+   any nullable business-critical column (e.g. Email, Phone).
+   Report what you find, even if the answer is "none found."
+2. Duplicate records - check for duplicate CustomerID, duplicate
+   Email addresses, duplicate LoyaltyNumber. Report findings.
+3. Orphan foreign keys - check for SalesTransaction rows whose
+   CustomerID doesn't exist in Customer, SalesTransactionItem rows
+   whose ProductID doesn't exist in Product, CampaignResponse rows
+   whose CampaignID/CustomerID don't exist. Report findings.
+4. Outliers - spot check TransactionTotal, UnitPrice, and
+   PurchaseAmount for unusually large or negative values (note:
+   sample data showed at least one TransactionTotal = 0 - flag
+   whether this is a valid "no purchase" record or a data issue).
+5. Referential/type consistency - confirm dates parse correctly,
+   confirm DiscountPercent values are 0-100, confirm
+   EmailOpened/CouponUsed/PurchaseCompleted are consistently 0/1.
+
+This report becomes part of Kelvin's Technical Report under "Data
+Preparation" - write it clearly enough that she can copy it in.
+
+DELIVERABLES: Documentation/DataQualityReport.md
+
+------------------------------------------------------------------
+YOUR DELIVERABLES CHECKLIST
+------------------------------------------------------------------
+[ ] Database/DatabaseCreation/10_LoadDataset.sql (or uspLoadDataset)
+[ ] All 10 tables loaded with correct row counts
+[ ] Import order followed exactly (FK dependency safe)
+[ ] Documentation/DataQualityReport.md
+[ ] Notify Kelvin to run validation, notify Brian/Lien that data
+    is ready for functions/views
+[ ] Push to feature/database, notify Dhruv for merge
+==================================================================

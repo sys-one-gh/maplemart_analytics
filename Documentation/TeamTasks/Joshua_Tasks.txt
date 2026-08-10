@@ -1,0 +1,144 @@
+==================================================================
+TASK FILE: JOSHUA  (P9 - POWER BI DEVELOPER)
+Intelligent Customer Campaign Prediction Platform
+Deadline: Wednesday, August 12, 2026
+Estimated time: 10-12 hours
+==================================================================
+
+YOUR ROLE
+You build the 6 mandatory Power BI dashboards. You are the last
+major piece in the pipeline - you need Lien's views, Sahil's
+predictions, and Parth's AI reports all in place before your
+dashboards can show real data. Start the design/layout early (Day
+3-4) with placeholder connections, then plug in real data as it
+becomes available.
+
+YOU ARE BLOCKED UNTIL:
+- Lien's 5 views exist (Day 3) - needed for dashboards 1-4
+- Sahil's CustomerPrediction table is populated (Day 4) - needed
+  for dashboard 5
+- Parth's AIReport table has approved reports (Day 5) - needed for
+  dashboard 6
+- Hassana's read-only Power BI login exists (Day 4)
+
+------------------------------------------------------------------
+SETUP (Day 3-4, as soon as views exist)
+------------------------------------------------------------------
+1. Open Power BI Desktop, connect to SQL Server using the
+   powerbi_reader login Hassana created.
+2. Import (or DirectQuery, your team's choice - document it) from:
+   Customer, Product, SalesTransaction, SalesTransactionItem,
+   MarketingCampaign, CampaignResponse, CustomerPrediction,
+   AIReport, ModelExecution, and Lien's 5 views.
+3. Set up any needed relationships in the Power BI model view
+   (Power BI may not auto-detect all FK relationships - check).
+
+------------------------------------------------------------------
+PRIMARY TASK I - 6 MANDATORY DASHBOARDS
+------------------------------------------------------------------
+
+DASHBOARD 1: EXECUTIVE OVERVIEW
+KPI cards: Total Customers, Active Customers, Total Sales, Average
+Purchase Value, Total Marketing Campaigns, Campaign Response Rate,
+Prediction Accuracy (from ModelExecution), AI Report Generation
+Date (from AIReport)
+Visuals: monthly sales trend (line chart), customer distribution by
+province (map or bar), campaign response trend (line), AI executive
+summary text panel (pull ReportText from AIReport where
+ReportType='Executive Summary')
+
+DASHBOARD 2: CUSTOMER ANALYTICS
+Visuals: customer age distribution (histogram), loyalty level
+distribution (pie/donut), customer lifetime value (bar, top N),
+average purchase amount (card/bar), purchase frequency (bar),
+days since last purchase (histogram)
+
+DASHBOARD 3: SALES PERFORMANCE
+Visuals: monthly sales (line chart), revenue by store (bar/map),
+revenue by category (tree map), revenue by product (bar, top N),
+average transaction value (card)
+
+DASHBOARD 4: MARKETING CAMPAIGN PERFORMANCE
+Visuals: customers contacted per campaign (bar), response rate
+(bar/funnel), purchase completion rate (funnel), average purchase
+amount per campaign, revenue generated per campaign, campaign
+ranking (table sorted by performance)
+
+DASHBOARD 5: MACHINE LEARNING DASHBOARD
+Visuals: confusion matrix (matrix visual or custom), prediction
+accuracy / precision / recall / F1 (KPI cards, from
+ModelExecution), predicted positive responses (card/gauge),
+probability distribution (histogram)
+
+DASHBOARD 6: ARTIFICIAL INTELLIGENCE DASHBOARD
+Visuals: text panels displaying each of the 5 ReportText values
+from AIReport (Executive Summary, Campaign Analysis, Prediction
+Interpretation, Business Recommendations, Dashboard Commentary),
+organized with navigation buttons/tabs between them, a table
+listing all reports with GeneratedDate and Approved status
+
+------------------------------------------------------------------
+DAX MEASURES (build as reusable measures, not calculated columns
+where avoidable)
+------------------------------------------------------------------
+Create at minimum:
+- Total Revenue = SUM(SalesTransaction[TransactionTotal])
+- Average Purchase Value = AVERAGE(SalesTransaction[TransactionTotal])
+- Customer Lifetime Value = (from vwCustomerLifetimeValue or your
+  own DAX calc)
+- Campaign Response Rate = DIVIDE(purchases completed, total
+  responses)
+- Average Discount = AVERAGE(SalesTransactionItem[Discount])
+- Prediction Accuracy = (pull from ModelExecution or calculate
+  from CustomerPrediction vs actual CampaignResponse)
+- Total Predicted Responders = COUNTROWS(FILTER(CustomerPrediction,
+  PredictionResult = "Yes"))
+
+Document every custom DAX measure (name + formula + purpose) in
+Documentation - PowerBI/DAXMeasures.md.
+
+------------------------------------------------------------------
+INTERACTIVITY REQUIREMENTS
+------------------------------------------------------------------
+Every dashboard should support at least:
+- Slicers (e.g. by province, by date range, by campaign)
+- Cross-filtering between visuals on the same page
+- At least one drill-through (e.g. click a campaign in Dashboard 4
+  to drill into that campaign's customer-level detail)
+- Sorting on tables
+- Meaningful, non-generic chart titles and consistent formatting/
+  color scheme across all 6 pages
+
+------------------------------------------------------------------
+SECONDARY TASK - VALIDATION + SCREENSHOTS (Day 6)
+------------------------------------------------------------------
+1. Close and reopen the .pbix, refresh the dataset, confirm every
+   visual loads without error and numbers look sane (no negative
+   revenue, no >100% rates).
+2. Test each slicer and drill-through actually filters correctly.
+3. Take a clean screenshot of each of the 6 dashboards (full page).
+4. Save screenshots to Images/ folder, named
+   Dashboard1_Executive.png through Dashboard6_AI.png.
+5. Send screenshots + a one-line description of each dashboard to
+   Kelvin for the Technical Report.
+
+DELIVERABLES: PowerBI/CustomerCampaignAnalytics.pbix,
+Documentation/DAXMeasures.md, 6 dashboard screenshots in Images/
+
+------------------------------------------------------------------
+YOUR DELIVERABLES CHECKLIST
+------------------------------------------------------------------
+[ ] Power BI connects to SQL Server via the read-only login
+[ ] Dashboard 1: Executive Overview
+[ ] Dashboard 2: Customer Analytics
+[ ] Dashboard 3: Sales Performance
+[ ] Dashboard 4: Marketing Campaign Performance
+[ ] Dashboard 5: Machine Learning Dashboard
+[ ] Dashboard 6: Artificial Intelligence Dashboard
+[ ] Slicers, cross-filtering, and at least one drill-through work
+[ ] DAX measures documented
+[ ] Dataset refresh tested and confirmed working
+[ ] 6 dashboard screenshots saved and sent to Kelvin
+[ ] Push PowerBI/CustomerCampaignAnalytics.pbix to feature/powerbi,
+    notify Dhruv for merge
+==================================================================

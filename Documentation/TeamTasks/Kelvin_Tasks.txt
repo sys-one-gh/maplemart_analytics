@@ -1,0 +1,145 @@
+==================================================================
+TASK FILE: KELVIN  (P3 - DATABASE DESIGNER)
+Intelligent Customer Campaign Prediction Platform
+Deadline: Wednesday, August 12, 2026
+Estimated time: 6-8 hours
+==================================================================
+
+YOUR ROLE
+You design the database on paper/diagram before Hassana builds it,
+you validate the implementation after data loads, and you assemble
+the final Technical Report. You are NOT blocked by anyone - start
+immediately on Day 1.
+
+------------------------------------------------------------------
+PRIMARY TASK B - DATABASE DESIGN (Day 1)
+------------------------------------------------------------------
+1. List every required entity (13 tables):
+   Reference: Store, ProductCategory, LoyaltyLevel, PaymentMethod,
+              CampaignType, MarketingChannel
+   Operational: Customer, LoyaltyMembership, Employee, Product,
+              SalesTransaction, SalesTransactionItem,
+              MarketingCampaign, CampaignResponse
+   Analytical: CustomerPrediction, AIReport, ModelExecution
+
+   NOTE: PaymentMethod and MembershipLevel/LoyaltyLevel values are
+   NOT in separate CSVs - they appear as text values inside
+   SalesTransactions.csv (PaymentMethod column) and
+   LoyaltyMemberships.csv (MembershipLevel column). You must design
+   these as proper lookup tables and note in your data dictionary
+   that seed values are derived from the distinct values found in
+   the source CSVs.
+
+2. Build the Entity Relationship Diagram (ERD) showing all 8
+   mandatory relationships:
+   Customer 1:1 LoyaltyMembership
+   Customer 1:M SalesTransaction
+   SalesTransaction 1:M SalesTransactionItem
+   ProductCategory 1:M Product
+   Product 1:M SalesTransactionItem
+   MarketingCampaign 1:M CampaignResponse
+   Customer 1:M CampaignResponse
+   Customer 1:M CustomerPrediction
+   MarketingCampaign 1:M AIReport
+   Use a tool like draw.io, dbdiagram.io, or SSMS's built-in
+   diagram tool. Export as PNG.
+
+3. For every table, decide:
+   - Primary key (identity column, no business meaning)
+   - Every column, with a SQL Server data type (INT, NVARCHAR(n),
+     DECIMAL(10,2), DATE, DATETIME2, BIT, CHAR(7) for postal code)
+   - Nullable Y/N
+   - Foreign keys
+   - Business rules (e.g. "PurchaseAmount >= 0", "Age >= 18",
+     "DiscountPercent BETWEEN 0 AND 100")
+
+4. Write a short 3NF justification: show you eliminated repeating
+   groups, partial dependencies, and transitive dependencies. One
+   paragraph per table group (Reference/Operational/Analytical) is
+   enough.
+
+5. Build the Data Dictionary as a spreadsheet or table with these
+   exact columns:
+   Table Name | Business Description | Attribute Name |
+   Business Purpose | Data Type | Max Length | Nullable | Primary
+   Key | Foreign Key | Default Value | Business Rules
+
+DELIVERABLES:
+- Documentation/ERDiagram.png
+- Documentation/DataDictionary.xlsx (or .md)
+- Short 3NF justification write-up (fold into the Data Dictionary
+  file or a separate paragraph)
+
+Hand your ERD + data dictionary to Hassana as soon as it's ready -
+she is blocked on your table/column decisions.
+
+------------------------------------------------------------------
+SECONDARY TASK - VALIDATION SCRIPT (Day 2-3)
+------------------------------------------------------------------
+Write Database/Validation/12_Validation.sql. It should check and
+print/select results for:
+1. Table existence - all 13 tables present
+2. Row counts match the source CSVs exactly:
+   Stores=25, ProductCategories=18, Products=500, Customers=5000,
+   LoyaltyMemberships=5000, Employees=250, MarketingCampaigns=40,
+   SalesTransactions=75000, SalesTransactionItems=250000,
+   CampaignResponses=18000
+3. No orphan foreign keys (e.g. every SalesTransaction.CustomerID
+   exists in Customer; every SalesTransactionItem.ProductID exists
+   in Product)
+4. No duplicate primary keys
+5. Constraint spot-checks (e.g. no negative PurchaseAmount, no
+   DiscountPercent outside 0-100)
+
+Run this script after Sahasri finishes the import (Day 2) and
+again after Dhruv's final integration test (Day 6). Save the output
+each time as evidence for the Technical Report.
+
+DELIVERABLES: Database/Validation/12_Validation.sql, two saved
+validation run outputs (post-import and post-integration-test)
+
+------------------------------------------------------------------
+SECONDARY TASK - TECHNICAL REPORT ASSEMBLY (Days 6-7)
+------------------------------------------------------------------
+You own pulling together the final Technical Report. Required
+sections (collect content from each teammate listed):
+1. Executive Summary - you write this last, once everything is done
+2. Business Problem - from the spec (MapleMart scenario, summarize
+   in your own words)
+3. Proposed Solution - from the spec's solution architecture
+4. Database Design - your own ERD + data dictionary
+5. SQL Server Implementation - ask Hassana, Brian, Lien for a short
+   write-up of what they built (views/procs/functions list)
+6. Data Preparation - ask Sahasri for the data quality report
+   summary
+7. Supervised Machine Learning - ask Sahil for algorithm choice,
+   feature list, evaluation metrics with interpretation
+8. Model Evaluation - Sahil's accuracy/precision/recall/F1/
+   confusion matrix, explained in business terms
+9. Power BI Dashboards - ask Joshua for dashboard screenshots +
+   short descriptions
+10. Generative AI Usage - pull directly from Parth's
+    PromptDocumentation.md
+11. Conclusions - summarize whether the prototype achieved its goal
+12. Recommendations - future extensions (churn prediction, sales
+    forecasting, etc. per spec section 6.13)
+
+Also collect the Team Contribution Statement - ask every teammate
+for a 2-3 line summary of what they personally did (or pull it from
+their individual task files once completed).
+
+DELIVERABLES: Documentation/TechnicalReport.pdf,
+Documentation/TeamContributionStatement.pdf (or combined in one doc)
+
+------------------------------------------------------------------
+YOUR DELIVERABLES CHECKLIST
+------------------------------------------------------------------
+[ ] Documentation/ERDiagram.png
+[ ] Documentation/DataDictionary.xlsx
+[ ] 3NF justification written
+[ ] Database/Validation/12_Validation.sql
+[ ] Two validation run outputs saved
+[ ] Documentation/TechnicalReport.pdf (all 12 sections)
+[ ] Team Contribution Statement collected from all 9 people
+[ ] Push everything to feature/database and feature/documentation
+==================================================================

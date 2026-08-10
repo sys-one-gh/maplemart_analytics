@@ -1,0 +1,145 @@
+==================================================================
+TASK FILE: SAHIL  (P8 - PYTHON & MACHINE LEARNING DEVELOPER)
+Intelligent Customer Campaign Prediction Platform
+Deadline: Wednesday, August 12, 2026
+Estimated time: 10-12 hours
+==================================================================
+
+YOUR ROLE
+You build the entire Python analytics pipeline: connect to SQL
+Server, engineer features, train and evaluate one classifier, and
+write predictions back to SQL. Parth's AI reports and Joshua's ML
+dashboard both depend on your output, so treat this as high
+priority once you're unblocked.
+
+YOU ARE BLOCKED UNTIL:
+- Lien's vwCustomerAnalytics view exists (Day 3)
+- Brian's uspGeneratePredictionDataset, uspStorePredictionResults,
+  and uspLogModelExecution procedures exist (Day 3)
+
+------------------------------------------------------------------
+PRIMARY TASK G1 - CONNECTIVITY, VALIDATION, FEATURES (Day 3-4)
+------------------------------------------------------------------
+1. Set up the project structure:
+   Python/Configuration/config.py + settings.json (connection
+   string, Ollama endpoint, model name - all externalized, add
+   settings.json to .gitignore, commit settings.example.json
+   instead)
+2. Python/Database/database.py - connect to SQL Server using
+   pyodbc or SQLAlchemy. Test the connection with a simple
+   SELECT 1.
+3. Python/Database/repository.py - a function that calls Brian's
+   uspGeneratePredictionDataset and loads the result into a pandas
+   DataFrame.
+4. Python/DataPreparation/validation.py - check for:
+   - missing values per column
+   - duplicate CustomerIDs
+   - obviously invalid values (negative spend, ages outside a
+     sane range)
+   Print/log a short validation summary.
+5. Python/DataPreparation/feature_engineering.py - confirm/derive
+   these 10 features are present and correctly typed (most should
+   already come from vwCustomerAnalytics, but do any final cleanup
+   here, e.g. encoding categorical variables):
+   - Customer Age
+   - Loyalty Level (encode as category/ordinal or one-hot)
+   - Number of Transactions
+   - Total Amount Spent
+   - Average Purchase Value
+   - Days Since Last Purchase
+   - Number of Campaigns Received
+   - Campaign Response Rate
+   - Number of Distinct Products Purchased
+   - Average Discount Received
+6. Separate predictor variables (X) from the target variable (y =
+   PurchaseCompleted).
+7. Handle any remaining missing values (impute or drop - document
+   your choice).
+
+DELIVERABLES: Python/Configuration/, Python/Database/,
+Python/DataPreparation/, all committed and documented with comments
+
+------------------------------------------------------------------
+PRIMARY TASK G2 - MODEL TRAINING & EVALUATION (Day 4)
+------------------------------------------------------------------
+1. Split the dataset into training and testing sets (e.g.
+   train_test_split, 80/20 or 70/30 - state your reasoning for the
+   split ratio in a comment or notebook markdown cell).
+2. Choose ONE classifier from: Logistic Regression, Decision Tree,
+   Random Forest, SVM, Naive Bayes, or K-Nearest Neighbours.
+   Write a short justification (2-3 sentences) of why you chose it
+   - e.g. "Random Forest handles the mix of numeric and categorical
+   features well and gives feature importance, which is useful for
+   marketing interpretation."
+3. Train the model in Python/MachineLearning/training.py.
+4. Evaluate in Python/MachineLearning/evaluation.py, computing:
+   - Accuracy
+   - Precision
+   - Recall
+   - F1 Score
+   - Confusion Matrix
+   Print/save these clearly. Write a short business interpretation
+   for each metric (e.g. "Precision of 0.78 means when the model
+   predicts a customer will respond, it's right 78% of the time -
+   useful for keeping campaign costs down.")
+5. Generate predictions for the full customer dataset (or the test
+   set, per your team's decision) in
+   Python/MachineLearning/prediction.py.
+6. For each prediction, call Brian's uspStorePredictionResults via
+   your database module, passing CustomerID, PredictionDate
+   (today), PredictionProbability, PredictionResult (Yes/No),
+   MLModel (your algorithm name), ModelVersion (e.g. "v1.0").
+7. After training completes, call uspLogModelExecution with your
+   algorithm name and the 4 metrics + duration, so
+   Brian/Hassana's ModelExecution table has a record of this run.
+
+------------------------------------------------------------------
+SECONDARY TASK - LOGGING MODULE (Day 4)
+------------------------------------------------------------------
+Add a simple logging setup (Python's built-in logging module) that
+records to Python/Logs/ (gitignored, folder tracked):
+- database connection established
+- dataset retrieved (row count)
+- validation completed (issues found, if any)
+- feature engineering completed
+- model training started/completed (with duration)
+- evaluation metrics computed
+- predictions generated (count)
+- predictions stored in SQL Server (count)
+- any errors/exceptions with a clear message
+
+DELIVERABLES: logging configured and wired into every step above
+
+------------------------------------------------------------------
+FINAL STEP - NOTEBOOK (Day 4, wrap-up)
+------------------------------------------------------------------
+Assemble Python/Notebooks/CustomerCampaignAnalytics.ipynb that runs
+the whole pipeline top to bottom (connection -> validation ->
+features -> split -> train -> evaluate -> predict -> store), with
+markdown cells explaining each step and your reasoning (split
+ratio, algorithm choice, metric interpretation). This notebook is
+what gets demonstrated live.
+
+Also write Python/requirements.txt listing every package used
+(pandas, numpy, pyodbc, sqlalchemy, scikit-learn, matplotlib,
+requests, jupyter, etc. with versions if you want to pin them).
+
+------------------------------------------------------------------
+YOUR DELIVERABLES CHECKLIST
+------------------------------------------------------------------
+[ ] Python/Configuration/ (config.py, settings.example.json)
+[ ] Python/Database/ (connection + repository working)
+[ ] Python/DataPreparation/ (validation + feature engineering)
+[ ] Python/MachineLearning/ (training, evaluation, prediction)
+[ ] Model trained, evaluated, 4 metrics + confusion matrix computed
+    and interpreted in business terms
+[ ] Predictions stored in CustomerPrediction via
+    uspStorePredictionResults
+[ ] Run logged via uspLogModelExecution
+[ ] Logging module wired throughout
+[ ] Python/Notebooks/CustomerCampaignAnalytics.ipynb runs end to end
+[ ] Python/requirements.txt
+[ ] Notify Parth that predictions + metrics are ready
+[ ] Notify Joshua that CustomerPrediction table is populated
+[ ] Push to feature/python, notify Dhruv for merge
+==================================================================

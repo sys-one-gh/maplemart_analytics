@@ -1,0 +1,127 @@
+==================================================================
+INTELLIGENT CUSTOMER CAMPAIGN PREDICTION PLATFORM
+MASTER PROJECT GUIDE
+SQL Server Development (ITE-5223) - Simulation 8-9
+==================================================================
+
+PROJECT LEAD: Dhruv
+TEAM SIZE: 9
+DEADLINE: Wednesday, August 12, 2026
+REPO: github.com/<org-or-username>/maplemart-analytics (private)
+COMPANY SCENARIO: MapleMart Canada - 25 stores + online, MapleRewards loyalty
+
+------------------------------------------------------------------
+HOW TO USE THIS FILE SET
+------------------------------------------------------------------
+This guide is the entry point. Each teammate also has their own
+text file (e.g. "Dhruv_Tasks.txt") with precise, numbered, step-by-
+step instructions for exactly what they build, in what order, and
+what "done" looks like. Hand each person only their own file.
+
+If you are starting a NEW chat session with an AI assistant to keep
+working on this project, paste this master file plus your own
+individual task file so the assistant has full context.
+
+------------------------------------------------------------------
+DATABASE NAME & CORE RULES (apply to everyone)
+------------------------------------------------------------------
+- Single SQL Server database: CustomerCampaignAnalytics
+- Schema: dbo only
+- Naming: tables singular (Customer), views vw*, procs usp*,
+  functions ufn*, PK_<Table>, FK_<Parent>_<Child>, IX_<Table>_<Col>
+- No hardcoded passwords/connection strings anywhere in code or repo
+- SQL Server is the single source of truth. Ollama never touches
+  SQL directly (only Python talks to Ollama). Power BI is read-only.
+- Historical data is never deleted.
+- Everything must be re-creatable from the scripts in the repo -
+  no manual/GUI-only changes.
+
+------------------------------------------------------------------
+THE 9 PEOPLE (P1-P9) AND THEIR ONE-LINE ROLE
+------------------------------------------------------------------
+P1  Dhruv    - PROJECT LEAD, Docker environment, GitHub, integration test, README
+P2  Parth    - AI Integration (Ollama + Mistral, 5 AI reports)
+P3  Kelvin   - Database Design (ERD, data dictionary, validation script)
+P4  Hassana  - Database Implementation (tables, constraints, indexes, security)
+P5  Sahasri  - Data Import & Quality (load 10 CSVs, quality report)
+P6  Lien     - SQL Analytical Views (5 mandatory views, business queries)
+P7  Brian    - Stored Procedures & Functions (7 procs, 5 functions)
+P8  Sahil    - Python & Machine Learning (features, model, predictions)
+P9  Joshua   - Power BI (6 dashboards, DAX measures)
+
+------------------------------------------------------------------
+7-DAY EXECUTION ORDER (who unblocks whom)
+------------------------------------------------------------------
+DAY 1
+  1. Dhruv:   docker-compose up (SQL Server 2022 + Ollama), pull mistral,
+              create GitHub repo + folder structure + branches
+  2. Kelvin:  ERD + data dictionary (can start immediately, no blocker)
+  3. Hassana: 01_CreateDatabase.sql, 02_CreateReferenceTables.sql,
+              03_CreateOperationalTables.sql (needs Dhruv's SQL container up)
+
+DAY 2
+  4. Hassana: 04_CreateAnalyticalTables.sql, 05_CreateConstraints.sql,
+              06_CreateIndexes.sql
+  5. Sahasri: 10_LoadDataset.sql - import all 10 CSVs (needs Hassana's
+              tables done)
+  6. Kelvin:  12_Validation.sql - run against imported data
+
+DAY 3
+  7. Brian:   08_CreateFunctions.sql (needs data imported to test)
+  8. Lien:    07_CreateViews.sql (needs Brian's functions done)
+  9. Brian:   09_CreateStoredProcedures.sql (needs Lien's views for some procs)
+  10. Sahil:  Python connects to SQL Server, starts feature engineering
+              (needs Lien's vwCustomerAnalytics view)
+
+DAY 4
+  11. Hassana: 11_CreateSecurity.sql (read-only login for Power BI)
+  12. Sahil:   Train + evaluate model, store predictions to SQL
+               (needs Brian's uspStorePredictionResults)
+  13. Parth:   Start Ollama integration (needs Sahil's predictions +
+               Brian's uspCampaignSummary)
+
+DAY 5
+  14. Parth:   Generate + store all 5 AI reports, get team review/approval
+  15. Joshua:  Start building Power BI dashboards (needs views done;
+               ML + AI dashboards need Sahil + Parth's data)
+
+DAY 6
+  16. Joshua:  Finish all 6 dashboards + validate + screenshot
+  17. Dhruv:   Run full end-to-end integration test from a clean clone
+  18. Kelvin:  Begin assembling Technical Report
+
+DAY 7
+  19. Everyone: Finalize Technical Report, README, Prompt Documentation,
+                Team Contribution Statement
+  20. Everyone: Build + rehearse presentation
+  --> SUBMIT: Wednesday, August 12, 2026
+
+------------------------------------------------------------------
+FINAL SUBMISSION CHECKLIST (Dhruv verifies before submitting)
+------------------------------------------------------------------
+[ ] Database recreates cleanly from scripts 01-12 in order
+[ ] All 10 CSVs imported, record counts match, FKs valid
+[ ] 5 views + 7 procedures + 5 functions all execute without error
+[ ] Python runs end-to-end, model trained, metrics documented
+[ ] CustomerPrediction table populated
+[ ] AIReport table has all 5 report types, marked Approved
+[ ] Power BI - all 6 dashboards load and refresh against SQL Server
+[ ] docker-compose up works on a clean machine
+[ ] README.md complete and accurate
+[ ] Technical Report complete (all required sections)
+[ ] Prompt Documentation complete
+[ ] Team Contribution Statement complete
+[ ] GitHub commit history shows contributions from all 9 people over time
+[ ] Presentation ready, every person has a speaking part
+
+------------------------------------------------------------------
+COMPANION FILES
+------------------------------------------------------------------
+- Simulation8-9_Full_Plan_v2.xlsx  (Responsibility Matrix, Task
+  Estimation with hour totals, RACI Chart, Dependency Map)
+- README.md                        (technical reference for the repo)
+- Individual task files:
+  Dhruv_Tasks.txt, Parth_Tasks.txt, Kelvin_Tasks.txt,
+  Hassana_Tasks.txt, Sahasri_Tasks.txt, Lien_Tasks.txt,
+  Brian_Tasks.txt, Sahil_Tasks.txt, Joshua_Tasks.txt
+==================================================================

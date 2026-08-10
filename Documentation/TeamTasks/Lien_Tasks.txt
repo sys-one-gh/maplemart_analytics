@@ -1,0 +1,112 @@
+==================================================================
+TASK FILE: LIEN  (P6 - SQL ANALYTICS DEVELOPER / VIEWS)
+Intelligent Customer Campaign Prediction Platform
+Deadline: Wednesday, August 12, 2026
+Estimated time: 8-10 hours
+==================================================================
+
+YOUR ROLE
+You build the analytical views everyone downstream depends on.
+Sahil's entire ML pipeline reads from your vwCustomerAnalytics view,
+and Joshua's Power BI dashboards read from several of your views.
+This makes you one of the most critical path people on the team.
+
+YOU ARE BLOCKED UNTIL:
+- Sahasri's data import is complete (Day 2)
+- Brian's functions (08_CreateFunctions.sql) exist, since your
+  views should call them (Day 3)
+
+------------------------------------------------------------------
+PRIMARY TASK E - 5 MANDATORY VIEWS (Day 3)
+------------------------------------------------------------------
+Create Database/Views/07_CreateViews.sql with these 5 views:
+
+1. vwCustomerAnalytics  *** MOST IMPORTANT - THIS IS THE ML INPUT ***
+   One row PER CUSTOMER (not per transaction). Must include at
+   minimum:
+   - CustomerID, Age (use Brian's ufnCustomerAge or the Age column),
+     Province, LoyaltyLevel/MembershipLevel
+   - Number of Transactions (COUNT from SalesTransaction)
+   - Total Amount Spent (SUM of TransactionTotal)
+   - Average Purchase Value (AVG of TransactionTotal)
+   - Days Since Last Purchase (use Brian's
+     ufnDaysSinceLastPurchase or DATEDIFF from MAX(TransactionDate))
+   - Number of Campaigns Received (COUNT from CampaignResponse)
+   - Campaign Response Rate (use Brian's ufnCampaignResponseRate,
+     or SUM(PurchaseCompleted)/COUNT(*) from CampaignResponse)
+   - Number of Distinct Products Purchased
+   - Average Discount Received (AVG(Discount) from
+     SalesTransactionItem)
+   - PurchaseCompleted (the target variable Sahil's model will
+     predict - pull the most recent CampaignResponse.PurchaseCompleted
+     per customer, or however your team decides to define "did this
+     customer respond positively," document your choice)
+   Build this with LEFT JOINs so customers with zero transactions
+   or zero campaign responses still appear (with 0/NULL handled
+   sensibly, e.g. ISNULL(..., 0)).
+
+2. vwCampaignPerformance
+   One row per campaign: CampaignID, CampaignName, Channel,
+   customers contacted, response rate, purchase completion rate,
+   total revenue generated, average purchase amount.
+
+3. vwSalesPerformance
+   Sales summarized by month, by store, and by product category
+   (three grouping dimensions - either one view with all three
+   columns and GROUP BY ROLLUP, or clearly document your grouping
+   choice).
+
+4. vwCustomerLifetimeValue
+   CustomerID, total historical spend, number of transactions,
+   customer tenure (days since RegistrationDate), and a simple CLV
+   calculation (e.g. total spend, or total spend / tenure * some
+   projection - document your formula).
+
+5. vwPredictionResults
+   Joins Customer + CustomerPrediction + (their most recent)
+   CampaignResponse so Power BI can compare actual vs predicted
+   outcomes side by side.
+
+TEST each view individually with SELECT TOP 100 * FROM
+<viewname> after creating it, and sanity-check the numbers look
+reasonable (no negative spend, no response rates above 100%, etc.)
+
+------------------------------------------------------------------
+SECONDARY TASK - BUSINESS QUERY PACK (Day 3-4)
+------------------------------------------------------------------
+Write Database/Views/BusinessQueries.sql containing standalone
+queries (not views) that answer these specific business questions
+from the spec, using CTEs, window functions, and joins:
+
+1. Top 20 customers by total revenue (use ORDER BY + TOP 20, or
+   RANK() OVER)
+2. Which campaign generated the highest response rate
+3. Which products generate the highest profit (UnitPrice - UnitCost)
+4. Which store has the highest monthly revenue (GROUP BY store,
+   month)
+5. Which loyalty level spends the most on average
+6. Which customers have not purchased within the last 6 months
+   (use DATEDIFF against GETDATE() or a fixed reference date)
+7. Which campaigns produced the highest ROI (revenue generated vs.
+   discount cost)
+
+For at least 2 of these queries, generate the execution plan in
+SSMS (right-click > Display Estimated Execution Plan) and write a
+short note in PerformanceNotes.md about whether an index helped
+and why.
+
+DELIVERABLES: Database/Views/BusinessQueries.sql,
+Database/Views/PerformanceNotes.md
+
+------------------------------------------------------------------
+YOUR DELIVERABLES CHECKLIST
+------------------------------------------------------------------
+[ ] Database/Views/07_CreateViews.sql (all 5 views, tested)
+[ ] vwCustomerAnalytics confirmed one-row-per-customer with a
+    clear PurchaseCompleted target column
+[ ] Database/Views/BusinessQueries.sql (7 business questions)
+[ ] Database/Views/PerformanceNotes.md
+[ ] Notify Sahil that vwCustomerAnalytics is ready
+[ ] Notify Joshua which views are ready for Power BI
+[ ] Push to feature/database, notify Dhruv for merge
+==================================================================

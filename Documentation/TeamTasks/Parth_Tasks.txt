@@ -1,0 +1,130 @@
+==================================================================
+TASK FILE: PARTH  (P2 - AI INTEGRATION DEVELOPER)
+Intelligent Customer Campaign Prediction Platform
+Deadline: Wednesday, August 12, 2026
+Estimated time: 8-10 hours
+==================================================================
+
+YOUR ROLE
+You connect Python to Ollama/Mistral and turn analytical results
+into 5 required business-language AI reports, stored back in SQL
+Server. You do NOT do machine learning - Sahil does that. You
+consume Sahil's predictions and Brian's campaign summary procedure.
+
+YOU ARE BLOCKED UNTIL:
+- Dhruv's Ollama container is running with Mistral pulled (Day 1)
+- Sahil has predictions stored in CustomerPrediction (Day 4)
+- Brian's uspCampaignSummary procedure exists (Day 3)
+Start your code/prompt design on Day 1-3, but final report
+generation happens Day 4-5.
+
+------------------------------------------------------------------
+PRIMARY TASK H - OLLAMA/MISTRAL INTEGRATION (Days 3-5)
+------------------------------------------------------------------
+1. Confirm Ollama REST endpoint works:
+   http://localhost:11434/api/generate, model="mistral"
+2. Create Python/Ollama/client.py:
+   - Function to send a prompt to Ollama and return the text response
+   - Read the endpoint URL and model name from a config file
+     (never hardcode)
+   - Handle timeouts/errors (retry once, then log failure)
+3. Create Python/Ollama/prompts.py with reusable prompt TEMPLATES
+   (not hardcoded final prompts) for each of the 5 report types
+   below. Every prompt should specify:
+   - the business role the model should assume (e.g. "You are a
+     retail marketing analyst at MapleMart Canada")
+   - the analytical context (what data is being summarized)
+   - the actual data values (pulled from SQL via Python)
+   - the expected output structure
+   - constraints (length, tone, no fabrication)
+4. Create Python/Ollama/report_generator.py that:
+   - Pulls the needed data from SQL Server (via Brian's procs/views)
+   - Fills in a prompt template
+   - Calls client.py to get a response from Mistral
+   - Validates the response isn't empty/garbage
+   - Calls Brian's uspStoreAIReport to write it into the AIReport
+     table
+
+------------------------------------------------------------------
+THE 5 REQUIRED AI REPORTS (generate one of each, minimum)
+------------------------------------------------------------------
+1. EXECUTIVE SUMMARY
+   Input: overall business metrics (total customers, campaigns,
+   response rate, prediction accuracy from Sahil's model)
+   Output: Executive Summary / Key Findings / Business Insights /
+   Marketing Recommendations / Conclusion (5 sections, professional
+   tone)
+
+2. CAMPAIGN ANALYSIS
+   Input: data from Brian's uspCampaignSummary for a specific
+   campaign (or top campaigns)
+   Output: explanation of why that campaign performed well/poorly
+
+3. PREDICTION INTERPRETATION
+   Input: Sahil's model evaluation metrics (accuracy, precision,
+   recall, F1, confusion matrix) and predicted-positive counts
+   Output: plain-language explanation of what the numbers mean and
+   whether the model is reliable enough to guide targeting
+
+4. BUSINESS RECOMMENDATIONS
+   Input: combined analytical results
+   Output: concrete suggestions for future campaigns, targeting,
+   channel choice, discount strategy
+
+5. DASHBOARD COMMENTARY
+   Input: summary stats matching what Joshua's Power BI dashboards
+   will show
+   Output: short narrative describing what a viewer should notice
+   (this will be displayed inside the Power BI AI dashboard)
+
+Every report must follow this structure internally:
+   Executive Summary -> Key Findings -> Business Insights ->
+   Marketing Recommendations -> Conclusion
+
+Store each in the AIReport table with columns:
+   AIReportID, ReportType, CampaignID (nullable if not campaign-
+   specific), GeneratedDate, ModelName='mistral', PromptVersion,
+   ReportText, Approved (0 until reviewed)
+
+------------------------------------------------------------------
+VALIDATION - READ BEFORE MARKING A REPORT APPROVED
+------------------------------------------------------------------
+Before setting Approved=1 on any report, check it is:
+- Factually consistent with the actual SQL data (no invented
+  numbers)
+- Free of contradictions
+- Professional in tone, no filler/nonsense
+- Relevant to the specific business question it was asked to answer
+If a generated report fails any check, refine the prompt and
+regenerate - do not hand-edit fabricated content into something
+true; regenerate instead.
+
+------------------------------------------------------------------
+SECONDARY TASK - PROMPT DOCUMENTATION (Day 6)
+------------------------------------------------------------------
+Write Documentation/PromptDocumentation.md containing, for each of
+the 5 report types:
+1. Selected LLM platform (Ollama running Mistral, locally)
+2. The purpose/business question the report answers
+3. A representative prompt (the actual filled-in text sent, one
+   real example per report type)
+4. A summary of the response received (2-3 sentences, not the full
+   text - full text lives in the AIReport table/SQL)
+5. Any modifications your team made to the raw output before
+   approving it
+6. What verification you performed (see Validation section above)
+
+This file feeds directly into the Technical Report's "Generative AI
+Usage" section - keep it precise so Kelvin can copy from it.
+
+------------------------------------------------------------------
+YOUR DELIVERABLES CHECKLIST
+------------------------------------------------------------------
+[ ] Python/Ollama/client.py
+[ ] Python/Ollama/prompts.py
+[ ] Python/Ollama/report_generator.py
+[ ] 5 AI reports (1 of each type minimum) stored in AIReport table
+[ ] All 5 reports reviewed and marked Approved=1
+[ ] Documentation/PromptDocumentation.md
+[ ] Push everything to feature/ollama, notify Dhruv for merge
+==================================================================

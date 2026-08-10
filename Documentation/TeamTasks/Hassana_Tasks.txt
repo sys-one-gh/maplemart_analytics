@@ -1,0 +1,105 @@
+==================================================================
+TASK FILE: HASSANA  (P4 - DATABASE IMPLEMENTATION DEVELOPER)
+Intelligent Customer Campaign Prediction Platform
+Deadline: Wednesday, August 12, 2026
+Estimated time: 8-10 hours
+==================================================================
+
+YOUR ROLE
+You turn Kelvin's design into actual SQL Server objects. You are
+the first person to touch the live database after it's created.
+
+YOU ARE BLOCKED UNTIL:
+- Dhruv's SQL Server Docker container is running (Day 1)
+- Kelvin's ERD + data dictionary are ready (Day 1, get this early)
+
+------------------------------------------------------------------
+PRIMARY TASK C - SCRIPTS 01-06 (Days 1-2)
+------------------------------------------------------------------
+Create these files under Database/DatabaseCreation and
+Database/Tables, Database/Constraints, Database/Indexes, in this
+exact execution order. Each script must run cleanly on its own
+after the previous one.
+
+1. 01_CreateDatabase.sql
+   CREATE DATABASE CustomerCampaignAnalytics;
+   Use it as the default for all following scripts (USE
+   CustomerCampaignAnalytics;)
+
+2. 02_CreateReferenceTables.sql
+   Create: Store, ProductCategory, LoyaltyLevel, PaymentMethod,
+   CampaignType, MarketingChannel
+   Each with an identity PK, a Name/Description column, and any
+   status column per Kelvin's data dictionary.
+   NOTE: LoyaltyLevel values (e.g. Bronze/Silver/Gold) and
+   PaymentMethod values (e.g. Cash/Credit/Debit) come from the
+   distinct values inside LoyaltyMemberships.csv and
+   SalesTransactions.csv - don't wait for a separate CSV, just
+   look at those columns and seed the lookup table yourself.
+
+3. 03_CreateOperationalTables.sql
+   Create: Customer, LoyaltyMembership, Employee, Product,
+   SalesTransaction, SalesTransactionItem, MarketingCampaign,
+   CampaignResponse
+   Use exact data types from Kelvin's data dictionary, e.g.:
+   - CustomerID INT IDENTITY PK
+   - Email NVARCHAR(255), Phone NVARCHAR(20), PostalCode CHAR(7)
+   - TransactionTotal DECIMAL(10,2)
+   - RegistrationDate DATE, ResponseDate DATETIME2
+
+4. 04_CreateAnalyticalTables.sql
+   Create: CustomerPrediction, AIReport, ModelExecution
+   CustomerPrediction: PredictionID PK, CustomerID FK,
+     PredictionDate, PredictionResult, PredictionProbability
+     DECIMAL(5,4), MLModel NVARCHAR(50), ModelVersion NVARCHAR(20)
+   AIReport: AIReportID PK, ReportType NVARCHAR(50), CampaignID FK
+     (nullable), GeneratedDate DATETIME2, ModelName NVARCHAR(50),
+     PromptVersion NVARCHAR(20), ReportText NVARCHAR(MAX),
+     Approved BIT DEFAULT 0
+   ModelExecution: ExecutionID PK, ExecutionDate, Algorithm,
+     Accuracy, Precision, Recall, F1Score, ExecutionDurationSeconds
+
+5. 05_CreateConstraints.sql
+   Add all foreign keys (naming FK_<Parent>_<Child>), NOT NULL
+   where required, CHECK constraints (PurchaseAmount >= 0,
+   Age >= 18, DiscountPercent BETWEEN 0 AND 100), UNIQUE on Email
+   and Loyalty Number, DEFAULT values (CustomerStatus = 'Active',
+   CreatedDate = GETDATE() where applicable).
+
+6. 06_CreateIndexes.sql
+   Create indexes named IX_<Table>_<Column> on: all foreign key
+   columns, CustomerID lookups, TransactionDate, ResponseDate, and
+   any column Lien/Sahil says they'll filter/join on frequently.
+   Don't over-index - only what's justified.
+
+TEST after each script: re-run the whole sequence from scratch on
+a fresh database to confirm no errors, no manual fixes needed.
+
+------------------------------------------------------------------
+SECONDARY TASK - SECURITY SCRIPT (Day 4)
+------------------------------------------------------------------
+Create Database/Security/11_CreateSecurity.sql:
+1. Create a SQL login/user specifically for Power BI, e.g.
+   powerbi_reader
+2. Grant SELECT-only permission on the views (once Lien has built
+   them) and any tables Power BI needs directly
+3. Do NOT grant INSERT/UPDATE/DELETE to this user
+4. Document the login name and note (in a comment, not the actual
+   password) that the password is stored in an untracked .env file
+
+DELIVERABLES: Database/Security/11_CreateSecurity.sql
+
+------------------------------------------------------------------
+YOUR DELIVERABLES CHECKLIST
+------------------------------------------------------------------
+[ ] 01_CreateDatabase.sql
+[ ] 02_CreateReferenceTables.sql
+[ ] 03_CreateOperationalTables.sql
+[ ] 04_CreateAnalyticalTables.sql
+[ ] 05_CreateConstraints.sql
+[ ] 06_CreateIndexes.sql
+[ ] 11_CreateSecurity.sql
+[ ] Full 01-06 sequence re-tested end to end without manual fixes
+[ ] Push to feature/database, notify Sahasri she can start import
+    and notify Dhruv for merge
+==================================================================

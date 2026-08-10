@@ -1,0 +1,161 @@
+==================================================================
+TASK FILE: DHRUV  (P1 - PROJECT LEAD & INTEGRATOR)
+Intelligent Customer Campaign Prediction Platform
+Deadline: Wednesday, August 12, 2026
+Estimated time: 8-10 hours
+==================================================================
+
+YOUR ROLE
+You lead the team, own the infrastructure (Docker), own the GitHub
+repo, run the final integration test, and write the README. You are
+also the merge gatekeeper for all feature branches.
+
+------------------------------------------------------------------
+PRIMARY TASK A - DOCKER ENVIRONMENT & DEPLOYMENT (Day 1)
+------------------------------------------------------------------
+1. Install/confirm Docker Desktop is running, virtualization enabled.
+2. Create docker-compose.yml defining two services:
+   a. sqlserver - image mcr.microsoft.com/mssql/server:2022-latest,
+      port 1433:1433, SA password via environment variable (NOT
+      hardcoded - use a .env file that is in .gitignore), volume
+      for data persistence.
+   b. ollama - image ollama/ollama, port 11434:11434, volume for
+      model storage.
+3. Run: docker compose up -d
+4. Verify SQL Server container is accepting connections
+   (test with sqlcmd or SSMS: localhost,1433).
+5. Run: docker exec -it <ollama-container> ollama pull mistral
+6. Verify Mistral responds via REST:
+   curl http://localhost:11434/api/generate -d '{"model":"mistral","prompt":"test"}'
+7. Write Docker/StartupInstructions.md documenting exact steps 1-6
+   so any teammate (or the instructor) can reproduce this from a
+   clean machine.
+
+DELIVERABLES: docker-compose.yml, Docker/StartupInstructions.md,
+.env.example (template, no real secrets)
+
+------------------------------------------------------------------
+PRIMARY TASK - GITHUB REPOSITORY SETUP (Day 1)
+------------------------------------------------------------------
+1. Create private repo: maplemart-analytics
+2. Description: "Predicts customer campaign responses using SQL
+   Server, Python/ML, Ollama+Mistral, and Power BI. ITE-5223
+   Simulation 8-9."
+3. Initialize with README (you'll replace it later) and a Python
+   .gitignore template.
+4. Add all 8 teammates as collaborators (Settings > Collaborators).
+5. Append these lines to .gitignore on top of the Python template:
+     # Secrets / config
+     .env
+     Python/Configuration/settings.json
+     !Python/Configuration/settings.example.json
+     # Docker
+     docker-data/
+     # Logs
+     Python/Logs/*.log
+     # Power BI
+     *.pbix.lock
+     ~$*.pbix
+     # OS
+     .DS_Store
+     Thumbs.db
+     # IDE
+     .vscode/
+     .idea/
+6. Create the folder structure (empty folders with a .gitkeep file
+   if needed):
+     Database/ (DatabaseCreation, Tables, Constraints, Indexes,
+                 Views, Functions, StoredProcedures, Security,
+                 SeedData, Validation)
+     Dataset/
+     Python/ (Configuration, Database, DataPreparation,
+               MachineLearning, Ollama, Reports, Logs, Notebooks)
+     PowerBI/
+     Docker/
+     Documentation/
+     Presentation/
+     Images/
+7. Create branches: main, feature/database, feature/python,
+   feature/powerbi, feature/ollama, feature/documentation
+8. Copy the 10 provided CSVs into Dataset/ and commit them.
+9. Push everything, confirm all 8 teammates can clone successfully.
+
+DELIVERABLES: initialized repo, .gitignore, folder structure,
+5 feature branches, all collaborators added
+
+------------------------------------------------------------------
+ONGOING DUTY - MERGE REVIEWS (Days 1-6)
+------------------------------------------------------------------
+- Each day, pull and skim teammates' commits on their feature
+  branches.
+- When a person's task is marked done, review their branch and
+  merge feature/<name> into main (or approve their PR if using
+  pull requests).
+- Watch for: hardcoded secrets, missing scripts in the sequence,
+  naming convention violations (vw*/usp*/ufn* prefixes, singular
+  table names).
+- Nudge anyone who is blocked (see Master Guide's dependency order)
+  so they know exactly when they can start.
+
+------------------------------------------------------------------
+SECONDARY TASK - END-TO-END INTEGRATION TEST (Day 6)
+------------------------------------------------------------------
+1. On a clean machine (or a fresh clone into a new folder), run
+   through the entire pipeline with zero manual fixes:
+   a. docker compose up -d
+   b. Execute SQL scripts 01 through 12 in order
+   c. Confirm all 10 CSVs import with correct row counts:
+      Stores=25, ProductCategories=18, Products=500, Customers=5000,
+      LoyaltyMemberships=5000, Employees=250, MarketingCampaigns=40,
+      SalesTransactions=75000, SalesTransactionItems=250000,
+      CampaignResponses=18000
+   d. Run the Python notebook/scripts end to end - confirm model
+      trains and CustomerPrediction gets populated
+   e. Run the Ollama integration - confirm AIReport gets 5 new rows
+   f. Open the Power BI file, refresh, confirm all 6 dashboards load
+2. Document any manual step that was required and get it fixed by
+   the responsible teammate before the deadline.
+3. Record this test as evidence (screenshots or a short log) for
+   the Technical Report.
+
+DELIVERABLES: test evidence (screenshots/log) confirming a clean
+run works start to finish
+
+------------------------------------------------------------------
+SECONDARY TASK - README.md (Day 7)
+------------------------------------------------------------------
+Write the final README.md at the repo root. Must include:
+1. Project title and one-paragraph business problem
+2. Team members and roles
+3. Technology stack table
+4. Repository structure (copy from folder layout above)
+5. Software requirements (Docker Desktop, Python 3.13, Power BI
+   Desktop, SSMS)
+6. Step-by-step deployment instructions (reuse your Docker
+   StartupInstructions.md content)
+7. Database setup instructions (run scripts 01-12 in order)
+8. Python execution instructions (install requirements.txt, run
+   notebook/scripts)
+9. Power BI report instructions (open .pbix, set data source,
+   refresh)
+10. Dataset description (list the 10 CSVs, row counts, brief
+    description each)
+11. Summary of the completed solution and key results (model
+    accuracy, sample AI recommendation, etc. - pull from teammates
+    once available)
+12. Known limitations
+
+DELIVERABLES: README.md (repo root)
+
+------------------------------------------------------------------
+FINAL DAY 7 CHECKLIST (you own this)
+------------------------------------------------------------------
+[ ] All branches merged into main
+[ ] Full submission checklist from Master Guide verified
+[ ] README complete
+[ ] Confirm Kelvin's Technical Report references your integration
+    test evidence
+[ ] Confirm presentation deck has a slide/section for every
+    teammate
+[ ] Submit repository link before deadline: Wed Aug 12, 2026
+==================================================================
