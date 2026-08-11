@@ -143,7 +143,7 @@ if ($envContent -match '^OLLAMA_PORT=') {
 } else {
     $envContent += "OLLAMA_PORT=$curOllamaPort"
 }
-$envContent = $envContent -replace '^DB_SERVER=.*', "DB_SERVER=localhost,$curSqlPort"
+$envContent = $envContent -replace '^DB_SERVER=.*', "DB_SERVER=127.0.0.1,$curSqlPort"
 $envContent = $envContent -replace '^OLLAMA_HOST=.*', "OLLAMA_HOST=http://localhost:$curOllamaPort"
 $envContent | Set-Content ".env"
 Get-Content ".env" | ForEach-Object {

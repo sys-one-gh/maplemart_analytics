@@ -187,7 +187,7 @@ fi
 
 grep -q '^SQLSERVER_PORT=' .env && sed_i "s/^SQLSERVER_PORT=.*/SQLSERVER_PORT=${CUR_SQLSERVER_PORT}/" .env || echo "SQLSERVER_PORT=${CUR_SQLSERVER_PORT}" >> .env
 grep -q '^OLLAMA_PORT=' .env && sed_i "s/^OLLAMA_PORT=.*/OLLAMA_PORT=${CUR_OLLAMA_PORT}/" .env || echo "OLLAMA_PORT=${CUR_OLLAMA_PORT}" >> .env
-sed_i "s/^DB_SERVER=.*/DB_SERVER=localhost,${CUR_SQLSERVER_PORT}/" .env
+sed_i "s/^DB_SERVER=.*/DB_SERVER=127.0.0.1,${CUR_SQLSERVER_PORT}/" .env
 sed_i "s#^OLLAMA_HOST=.*#OLLAMA_HOST=http://localhost:${CUR_OLLAMA_PORT}#" .env
 set -a; source .env; set +a
 ok "SQL Server -> host port $SQLSERVER_PORT, Ollama -> host port $OLLAMA_PORT"

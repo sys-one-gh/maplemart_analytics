@@ -26,6 +26,16 @@ cd maplemart_analytics
 
 **Windows without WSL:**
 
+PowerShell blocks running `.ps1` scripts by default - if you see an error
+like *"running scripts is disabled on this system"*, run this once first
+(only affects your current PowerShell window, not a permanent system change):
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+Then:
+
 ```powershell
 git clone https://github.com/sys-one-gh/maplemart_analytics.git
 cd maplemart_analytics
@@ -126,7 +136,8 @@ Database/     SQL scripts (run in order: DatabaseCreation, Tables, Constraints,
               Indexes, Functions, Views, StoredProcedures, Security, Validation)
 Dataset/      the 10 CSVs
 Python/       Configuration, Database, DataPreparation, MachineLearning,
-              Ollama, Notebooks, Logs
+              Ollama, Notebooks, Logs, load_to_rds.py (cloud DB loader, see
+              PowerBI_Setup_Guide.md section 0c)
 PowerBI/      CustomerCampaignAnalytics.pbix goes here (see Documentation/PowerBI_Setup_Guide.md)
 Docker/       docker-compose.yml details + StartupInstructions.md
 Documentation/ ERD, data dictionary, technical report, team task files
@@ -149,4 +160,10 @@ scripts/      setup.sh / setup.ps1 / push_my_work.sh|ps1
 ## 10. What's next
 
 Once your part of the database/Python/Ollama work is solid, Power BI is the
-last piece - see `Documentation/PowerBI_Setup_Guide.md`.
+last piece - see `Documentation/PowerBI_Setup_Guide.md`. It covers both
+Power BI Desktop (Windows/VM, connects to your local Docker database) and a
+fully-browser alternative (Power BI Service + a small cloud SQL Server
+instance, no Windows needed at all - see its section 0c). Whoever isn't
+building the dashboards themselves doesn't need database access either way -
+the finished `PowerBI/CustomerCampaignAnalytics.pbix` in the repo is a
+self-contained snapshot anyone can open.
