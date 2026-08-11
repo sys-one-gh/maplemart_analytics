@@ -11,14 +11,16 @@ Parth's Documentation/PromptDocumentation.md should reference the version
 that produced each stored report.
 """
 
-PROMPT_VERSION = "v1.0"
+PROMPT_VERSION = "v1.1"
 
 _STRUCTURE = (
     "Structure your response with exactly these five headed sections, in this order: "
     "Executive Summary, Key Findings, Business Insights, Marketing Recommendations, Conclusion. "
     "Base every claim strictly on the data given below - do not invent numbers, customers, or "
-    "campaigns that are not present in the data. Keep the tone professional and concise "
-    "(under 400 words total)."
+    "campaigns that are not present in the data. Do not reference a specific time period "
+    "(quarter, year, month) unless one is explicitly provided in the data above - v1.0 of this "
+    "prompt fabricated 'Q1 2023' when no timeframe was ever supplied. Keep the tone professional "
+    "and concise (under 400 words total)."
 )
 
 
