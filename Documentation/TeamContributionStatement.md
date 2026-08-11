@@ -1,7 +1,7 @@
 # Team Contribution Statement
 
 Per-person summary of what was built, matching the responsibility split in
-`Documentation/TeamTask
+`Documentation/TeamTasks/00_MASTER_PROJECT_GUIDE.txt`.
 
 **Dhruv (P1) — Project Lead & Integrator**: Built `docker-compose.yml`
 (SQL Server 2022 + Ollama, cross-platform including Apple Silicon
