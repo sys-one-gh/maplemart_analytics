@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Project-specific additions (not covered by the Python template above) ---
+
+# Secrets / config
+Python/Configuration/settings.json
+!Python/Configuration/settings.example.json
+
+# Power BI
+*.pbix.lock
+~$*.pbix
+PowerBI/CSVExport/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
