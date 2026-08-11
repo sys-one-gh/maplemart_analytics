@@ -1,9 +1,3 @@
--- BusinessQueries.sql
--- Standalone analytical queries (not views) answering the 7 required
--- business questions, using CTEs and window functions. Run each block
--- independently in SSMS. For at least 2 of these, capture the estimated
--- execution plan and note it in PerformanceNotes.md.
-
 USE CustomerCampaignAnalytics;
 GO
 
