@@ -1,7 +1,10 @@
 -- 12_Validation.sql
 -- Post-load sanity checks. Run after 10_LoadDataset.sql (and again after
 -- Dhruv's end-to-end integration test). Every SELECT below should return
--- zero rows 
+-- zero rows except the "table existence" and "row counts" ones.
+
+USE CustomerCampaignAnalytics;
+GO
 
 PRINT '--- 1. Table existence (expect 13 tables) ---';
 SELECT t.name AS TableName
