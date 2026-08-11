@@ -154,6 +154,12 @@ scripts/      setup.sh / setup.ps1 / push_my_work.sh|ps1
 - **pyodbc connection errors**: confirm `.venv` is active and `.env` exists;
   re-run `./scripts/setup.sh --skip-data` to re-verify prerequisites without
   reloading data.
+- **"Login timeout expired" / TCP error 0x2AF9 on macOS, even though
+  `docker ps` shows the container healthy**: on some Macs, `localhost`
+  resolves to the IPv6 loopback first and pyodbc/sqlcmd hangs against it
+  even though the container is reachable. `.env`'s `DB_SERVER` already
+  defaults to `127.0.0.1` (not `localhost`) specifically to avoid this -
+  if you've edited it back to `localhost` and hit this, switch it back.
 - **Script fails mid-way**: it's safe to just re-run it - every step is
   idempotent (the database is fully recreated from scratch each run).
 
