@@ -65,19 +65,57 @@ scripts/        setup.sh / setup.ps1 / push_my_work.sh|ps1
 
 ## Deployment
 
-One command from a fresh clone:
+One command from a fresh clone gets a fully working local environment -
+Docker, database, data, and Python all set up automatically.
+
+**macOS / Linux / WSL:**
 
 ```bash
 git clone https://github.com/sys-one-gh/maplemart_analytics.git
 cd maplemart_analytics
-./scripts/setup.sh          # macOS/Linux/WSL
-# or: .\scripts\setup.ps1   # native Windows
+./scripts/setup.sh
 ```
 
-This installs prerequisites, starts SQL Server + Ollama in Docker, creates
-the full schema, loads the dataset, and sets up a Python virtualenv. Full
-details, troubleshooting, and the AI-report/AWS-alternative paths:
-**[`SETUP.md`](SETUP.md)**.
+**Windows (native PowerShell, no WSL):**
+
+```powershell
+git clone https://github.com/sys-one-gh/maplemart_analytics.git
+cd maplemart_analytics
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass   # only if scripts are blocked
+.\scripts\setup.ps1
+```
+
+What that one command does, automatically, on every platform:
+
+1. Checks for Docker, Python 3.9+, and the Microsoft ODBC Driver 18 -
+   installs whichever are missing (Homebrew on Mac, apt on Linux/WSL,
+   winget on Windows).
+2. Generates `.env` with random database passwords (gitignored, never
+   committed).
+3. Detects if ports `1433`/`11434` are already taken and auto-picks the
+   next free port if so.
+4. Starts the `sqlserver` + `ollama` containers via `docker compose`.
+5. Creates the full schema (13 tables, 5 views, 5 functions, 7 procedures)
+   and loads the dataset - either the real 10 CSVs in `Dataset/`, or
+   auto-generated synthetic placeholder data if those aren't present yet.
+6. Runs validation checks (row counts, orphan FKs, duplicate keys).
+7. Creates a Python virtualenv and installs `Python/requirements.txt`.
+
+**One manual step the first time** (Docker's own requirement, not
+something a script can skip): if Docker Desktop had to be installed
+fresh, launch it once to accept its permissions, then re-run the setup
+command above.
+
+**Prerequisites you need already installed**: Git, and either Docker
+Desktop (Mac/Windows) or Docker Engine (Linux/WSL) — everything else is
+handled for you.
+
+**Working on a specific part of the project?** Add `--branch feature/<yourname>`
+(or `-Branch feature/<yourname>` on PowerShell) to switch onto your branch
+as part of the same command - see the branch table in `SETUP.md` §4.
+
+Full details, troubleshooting, the optional AI-report step, and the
+AWS-alternative deployment path: **[`SETUP.md`](SETUP.md)**.
 
 ## Database
 
