@@ -2,8 +2,7 @@
 
 Source of truth is `Database/Tables/*.sql` - this diagram is generated from
 the actual deployed schema, not designed independently of it. Rendered with
-Mermaid (renders natively on GitHub and most Markdown viewers). Export a PNG
-via any Mermaid renderer if a static image file is required for submission.
+Mermaid (renders natively on GitHub and most Markdow.
 
 ```mermaid
 erDiagram
