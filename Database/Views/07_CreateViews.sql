@@ -1,23 +1,9 @@
--- 07_CreateViews.sql
--- 5 mandatory views. Requires 08_CreateFunctions.sql to have run first.
-
 USE CustomerCampaignAnalytics;
 GO
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO
 
--- vwCustomerAnalytics: ONE ROW PER CUSTOMER - this is the ML training input.
--- PurchaseCompleted (the target column) is taken from each customer's most
--- recent CampaignResponse row; customers with no response history get NULL
--- (Python/DataPreparation drops or imputes these - see feature_engineering.py).
---
--- Deliberately does NOT call ufnCustomerAge/ufnAveragePurchase/etc. here -
--- those functions still exist standalone (per spec), but calling a scalar
--- UDF once per row forces SQL Server into a row-by-row plan instead of a
--- set-based one. Measured impact: 14+ seconds for a SELECT COUNT(*) over
--- just 5,000 rows on a small instance, vs. sub-second inlined. Same output,
--- computed as plain joins/aggregates instead.
 IF OBJECT_ID('dbo.vwCustomerAnalytics', 'V') IS NOT NULL DROP VIEW dbo.vwCustomerAnalytics;
 GO
 CREATE VIEW dbo.vwCustomerAnalytics AS
