@@ -2,8 +2,7 @@
 
 Generated from the actual deployed schema (`Database/Tables/*.sql`,
 `Database/Constraints/05_CreateConstraints.sql`) - every type, nullability,
-default, and constraint below matches what's really running, not a
-separate design document that could drift from it.
+default, and constraint be
 
 ## Reference tables
 
