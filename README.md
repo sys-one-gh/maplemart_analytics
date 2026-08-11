@@ -129,6 +129,51 @@ the full dashboard/DAX spec:
 | SalesTransactionItems.csv | 250,000 | |
 | CampaignResponses.csv | 18,000 | `PurchaseCompleted` is the ML target |
 
+## How this was built
+
+Not a designed-once-then-implemented project — the build order was
+infrastructure first, then the pieces were connected and tested for real at
+every stage, with real bugs found and fixed along the way rather than
+assumed away:
+
+1. **Docker environment** — SQL Server 2022 + Ollama, cross-platform
+   (including Apple Silicon emulation, since Microsoft doesn't publish an
+   arm64 SQL Server image), with automatic port-conflict detection so
+   `1433`/`11434` being already taken on someone's machine doesn't block them.
+2. **Database layer** — schema, functions, views, procedures, security —
+   built and tested against real data, not sample rows. Loading the real
+   10-CSV dataset surfaced two genuine data-quality problems (a numeric
+   column that was 0 for every row; a date-derived column that was stale
+   for some rows) which got fixed at the load-script level, not patched
+   around downstream.
+3. **Python ML pipeline** — connectivity, feature engineering, training,
+   evaluation, prediction storage. Trained and verified twice, independently,
+   in two different environments (see below) to make sure the result wasn't
+   an artifact of one machine's state.
+4. **A real cloud deployment, not just local Docker** — the whole platform
+   was also stood up on **AWS RDS SQL Server** to prove it isn't hardcoded
+   to one setup. This surfaced its own real problems: `BULK INSERT` doesn't
+   work against a filesystem-less managed database (solved with a
+   Python-based loader instead), and a view that ran fine locally took
+   **14.5 seconds** on the smaller cloud instance because it called scalar
+   SQL functions once per row — rewriting it as set-based joins brought that
+   down to **0.5 seconds**, a fix that ended up mattering everywhere that
+   view is used, not just on AWS.
+5. **AI reports via Ollama/Mistral** — generated, then actually read rather
+   than assumed correct. Two of the five initially invented a timeframe
+   ("Q1") that was never supplied in the prompt - caught, the prompt fixed,
+   regenerated, verified clean before approval.
+6. **Power BI** — connected to the live database, hit a Power BI Service
+   tenant-governance restriction blocking live cloud-source refresh
+   mid-project, diagnosed it, and switched to a CSV-based import path that
+   sidesteps it entirely. Also caught and removed an incorrectly
+   auto-detected table relationship (`Customer.City` ↔ `Store.City` — a
+   coincidental column-name match, not a real foreign key) before it could
+   silently produce misleading cross-filtered numbers on a dashboard.
+
+Every fix above came from actually running the thing and looking at the
+output — not from reasoning about what should theoretically work.
+
 ## Results summary
 
 - **Model**: Random Forest classifier, target `PurchaseCompleted`, 10
