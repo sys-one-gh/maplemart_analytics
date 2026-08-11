@@ -1,7 +1,6 @@
 # Technical Report — Intelligent Customer Campaign Prediction Platform
 
-**Course**: SQL Server Development (ITE-5223), Simulation 8–9
-**Company scenario**: MapleMart Canada — 25-store Ontario grocery retailer, MapleRewards loyalty program
+**Course**: SQLanada — 25-store Ontario grocery retailer, MapleRewards loyalty program
 
 ---
 
