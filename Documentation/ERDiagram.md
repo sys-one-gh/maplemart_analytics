@@ -2,8 +2,14 @@
 
 Source of truth is `Database/Tables/*.sql` - this diagram is generated from
 the actual deployed schema, not designed independently of it. Rendered with
-Mermaid (renders natively on GitHub and most Markdown viewers). Export a PNG
-via any Mermaid renderer if a static image file is required for submission.
+Mermaid (renders natively on GitHub and most Markdown viewers). A static
+image is also included for submission/viewers without Mermaid support:
+**[`ERDiagram.png`](ERDiagram.png)**.
+
+`ModelExecution` (top right of the rendered image) has no lines connecting
+it to the other entities - that's correct, not a rendering gap. It's a
+standalone log of model training runs with no foreign key to any other
+table.
 
 ```mermaid
 erDiagram
@@ -68,7 +74,7 @@ erDiagram
         nvarchar CustomerStatus
     }
     LoyaltyMembership {
-        int CustomerID PK_FK
+        int CustomerID PK "also FK to Customer"
         nvarchar LoyaltyNumber
         int LoyaltyLevelID FK
         date JoinDate
