@@ -39,7 +39,68 @@ published - clicking "Refresh" in the Service *would* need the gateway, but
 for a course submission a static, current snapshot is normal and expected.
 Re-publish from Desktop any time your data changes.
 
-## 1. Connect
+## 0c. Alternative: AWS RDS + Power BI Service, fully in Chrome (no Windows at all)
+
+This is the path we actually used when no Windows machine/VM was available.
+Instead of local Docker, the database runs on a small AWS RDS SQL Server
+Express instance (free tier), which Power BI Service can query directly from
+the browser - no gateway, no Desktop, no VM, because Power BI's backend
+servers reach RDS over the internet the same way they'd reach Azure SQL.
+
+**One-time setup (already done for this project - here for reference/reuse):**
+1. RDS -> Create database -> Standard create -> Engine: **Microsoft SQL
+   Server**, Edition: **SQL Server Express Edition**, Template: **Free tier**.
+2. Connectivity: **Public access: Yes** (required, or nothing outside AWS can
+   reach it - not even Power BI).
+3. Security group inbound rule: allow **TCP 1433**. Source needs to cover
+   Power BI Service's cloud IPs, not your own - in practice this means either
+   `0.0.0.0/0` (all IPs; only acceptable because a strong password still
+   gates actual login - never do this with a weak/reused password) or
+   Microsoft's published Azure/Power BI IP ranges (more setup, more secure).
+4. Run the schema against the endpoint directly (no Docker needed - `sqlcmd`
+   or any SQL client works once public access + the security group are set):
+   ```
+   sqlcmd -S <endpoint>,1433 -U admin -P '<password>' -C -No -b -i Database/DatabaseCreation/01_CreateDatabase.sql
+   # ...same for 02 through 09, in the order listed in section 1 below...
+   sqlcmd -S <endpoint>,1433 -U admin -P '<password>' -C -No -b -v PowerBiPassword='<pbi-password>' -i Database/Security/11_CreateSecurity.sql
+   ```
+5. Load the data with **`Python/load_to_rds.py`** instead of
+   `10_LoadDataset.sql` - RDS has no filesystem access for `BULK INSERT` to
+   read local CSVs from, so this script inserts the same data over the
+   network via `pyodbc` instead:
+   ```
+   .venv/bin/python Python/load_to_rds.py --server <endpoint>,1433 --user admin --password '<password>' --database CustomerCampaignAnalytics
+   ```
+   This is noticeably slower than local `BULK INSERT` (network round-trips
+   vs. a server-side file read) - budget 10-15 minutes for the full dataset
+   on a free-tier `db.t3.micro` instance.
+
+**Connecting from Power BI Service (app.powerbi.com) in Chrome:**
+1. Sign in -> **Create** -> **Get data from other sources** -> **SQL Server database**.
+2. Server: `<endpoint>,1433` (comma before the port). Database: `CustomerCampaignAnalytics`.
+3. Data gateway: `(none)`.
+4. Authentication kind: **Basic** - Username `admin` (or the `powerbi_reader`
+   read-only login), Password as set above.
+5. **If you get "unable to connect using an encrypted connection"**: uncheck
+   **"Use encrypted connection"** and try again - this is a known quirk
+   connecting to RDS's certificate from Power BI's connector; unchecking it
+   is safe here since the connection is already password-gated and this
+   isn't sensitive production data.
+6. Select the 5 views + tables listed in section 1 below, click **"Transform
+   data"**, then **"Create a report"** - name the semantic model, pick **My
+   workspace**, Create.
+
+**How teammates without their own RDS instance see the finished dashboard:**
+They don't need database access at all. Once the report is built (Import
+mode bakes the data into it), use Power BI Service's **export/download to
+`.pbix`** and commit that file as `PowerBI/CustomerCampaignAnalytics.pbix` in
+the repo - anyone can open it (Desktop, or upload to their own free Power BI
+account) with zero credentials needed. Only the person actively *building*
+the dashboards needs live RDS access; everyone else just needs the finished
+file. Keeping the RDS instance running/public indefinitely isn't necessary
+once that export is done - delete or lock down the instance afterward.
+
+## 1. Connect (local Docker path)
 
 1. Get Data -> **SQL Server**.
 2. Server: `localhost,<SQLSERVER_PORT from .env>` (usually `localhost,1433` - check `.env` in case the setup script had to auto-pick a different port)
