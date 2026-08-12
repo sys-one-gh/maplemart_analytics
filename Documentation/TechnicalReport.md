@@ -183,14 +183,55 @@ so there's a history of every training attempt, not just the latest.
 
 ## 9. Power BI Dashboards
 
-*[Pending — dashboard construction in progress at time of writing. Will be
-completed with: screenshots of all 6 required dashboards
-(`Images/Dashboard1_Executive.png` through `Dashboard6_AI.png`), the DAX
-measures used, and notes on the two supported connection paths (Power BI
-Desktop live connection vs. Power BI Service CSV import — the latter
-required after a Power BI Service tenant governance policy blocked live
-cloud-source refresh; see `Documentation/PowerBI_Setup_Guide.md` §0c for
-the full diagnosis and workaround).]*
+Built entirely in Power BI Service (browser-only — no Windows machine or VM
+was available for Power BI Desktop). Two real obstacles came up building
+this way, both documented in full in `Documentation/PowerBI_Setup_Guide.md`:
+
+1. **Live refresh blocked by tenant governance.** Power BI Service refused
+   to refresh a live cloud SQL Server connection (`Premium_ASWL_Error` —
+   a Humber-tenant policy, not a bug). Worked around by exporting the
+   database's tables and views to CSV and importing those instead — an
+   Import-mode snapshot rather than a live connection, acceptable for a
+   course submission (§0c/0d of the setup guide).
+2. **Fifteen CSVs uploaded individually create fifteen separate,
+   unrelated single-table datasets** in Power BI Service — there's no way
+   to build cross-filtering or relationships across them that way. Fixed
+   by combining all 14 exported tables/views into one Excel workbook (one
+   sheet per table) and uploading that as a single file, which Power BI
+   Service loads as one semantic model with auto-detected relationships.
+   One false positive from that auto-detection was caught and removed —
+   `Customer.City ↔ Store.City`, a coincidental column-name match, not a
+   real foreign key (stores and customers can share a city with no
+   relationship between them).
+
+**Dashboards completed: 5 of the 6 required** — Executive Overview,
+Customer Analytics, Sales Performance, Marketing Campaign Performance, and
+the ML Dashboard (screenshots: `Images/Dashboard1_Executive.png` through
+`Dashboard5_ML.png`; full interactive version:
+`PowerBI/CustomerCampaignAnalytics.pbix`). The 6th (AI Dashboard — text
+panels for all 5 AI reports plus a report index table) was not finished
+before submission due to time constraints; a `ReportText` table for one
+report exists on the ML Dashboard page as a partial start.
+
+Visuals use built-in field aggregations (Count, Sum, Average, Max) rather
+than custom DAX measures — given the time available, this covered every
+required visual without needing hand-written DAX.
+
+**Known issues, left as-is under time pressure rather than fixed:**
+- Dashboard 3 substitutes "units sold by category" for the spec's
+  "revenue by product" — the CSV export used for this dashboard doesn't
+  include line-item/product-level sales data (only the pre-aggregated
+  `vwSalesPerformance`, grained at store/category/month), so a
+  product-level revenue chart isn't buildable from what was exported.
+- Dashboard 1's KPI card row is incomplete (1 of 8 planned cards — only
+  Total Customers).
+- Dashboard 1's AI Executive Summary panel still shows the uncorrected
+  "Q1 2023" fabrication. The fix itself is real and already in the
+  codebase (`Python/Ollama/prompts.py`, prompt `v1.1` — see
+  `Documentation/PromptDocumentation.md`), but the AI report text loaded
+  into this specific Power BI export was generated before that fix was
+  re-applied locally, and wasn't regenerated in time to correct this
+  panel before submission.
 
 ## 10. Generative AI Usage
 
