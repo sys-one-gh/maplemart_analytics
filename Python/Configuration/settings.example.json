@@ -1,0 +1,22 @@
+{
+  "database": {
+    "server": "localhost,1433",
+    "database": "CustomerCampaignAnalytics",
+    "user": "sa",
+    "password": "REPLACE_ME",
+    "driver": "ODBC Driver 18 for SQL Server",
+    "encrypt": false,
+    "trust_server_certificate": true
+  },
+  "ollama": {
+    "host": "http://localhost:11434",
+    "model": "mistral",
+    "timeout_seconds": 120
+  },
+  "ml": {
+    "algorithm": "RandomForest",
+    "model_version": "v1.0",
+    "test_size": 0.2,
+    "random_state": 42
+  }
+}
